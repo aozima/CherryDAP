@@ -270,7 +270,7 @@ static volatile uint8_t uarttx_idle_flag = 0;
 USB_NOCACHE_RAM_SECTION chry_ringbuffer_t g_uartrx;
 USB_NOCACHE_RAM_SECTION chry_ringbuffer_t g_usbrx;
 
-void usbd_event_handler(uint8_t event)
+void usbd_event_handler(uint8_t busid, uint8_t event)
 {
     switch (event) {
         case USBD_EVENT_RESET:
@@ -446,7 +446,7 @@ void chry_dap_init(void)
 #ifdef CONFIG_CHERRYDAP_USE_MSC
     usbd_add_interface(usbd_msc_init_intf(&intf3, MSC_OUT_EP, MSC_IN_EP));
 #endif
-    usbd_initialize(0, 0, 0);
+    usbd_initialize(0, 0, usbd_event_handler);
 }
 
 void chry_dap_handle(void)
