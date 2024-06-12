@@ -291,8 +291,8 @@ void usbd_event_handler(uint8_t event)
             /* setup first out ep read transfer */
             USB_RequestIdle = 0U;
 
-            usbd_ep_start_read(DAP_OUT_EP, USB_Request[0], DAP_PACKET_SIZE);
-            usbd_ep_start_read(CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
+            usbd_ep_start_read(0, DAP_OUT_EP, USB_Request[0], DAP_PACKET_SIZE);
+            usbd_ep_start_read(0, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
             break;
         case USBD_EVENT_SET_REMOTE_WAKEUP:
             break;
@@ -318,7 +318,7 @@ void dap_out_callback(uint8_t ep, uint32_t nbytes)
 
     // Start reception of next request packet
     if ((uint16_t)(USB_RequestCountI - USB_RequestCountO) != DAP_PACKET_COUNT) {
-        usbd_ep_start_read(DAP_OUT_EP, USB_Request[USB_RequestIndexI], DAP_PACKET_SIZE);
+        usbd_ep_start_read(0, DAP_OUT_EP, USB_Request[USB_RequestIndexI], DAP_PACKET_SIZE);
     } else {
         USB_RequestIdle = 1U;
     }
@@ -343,7 +343,7 @@ void usbd_cdc_acm_bulk_out(uint8_t ep, uint32_t nbytes)
 {
     chry_ringbuffer_write(&g_usbrx, usb_tmpbuffer, nbytes);
     if (chry_ringbuffer_get_free(&g_usbrx) >= DAP_PACKET_SIZE) {
-        usbd_ep_start_read(CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
+        usbd_ep_start_read(0, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
     } else {
         usbrx_idle_flag = 1;
     }
@@ -485,7 +485,7 @@ void chry_dap_handle(void)
         if (USB_RequestIdle) {
             if ((uint16_t)(USB_RequestCountI - USB_RequestCountO) != DAP_PACKET_COUNT) {
                 USB_RequestIdle = 0U;
-                usbd_ep_start_read(DAP_OUT_EP, USB_Request[USB_RequestIndexI], DAP_PACKET_SIZE);
+                usbd_ep_start_read(0, DAP_OUT_EP, USB_Request[USB_RequestIndexI], DAP_PACKET_SIZE);
             }
         }
 
@@ -575,7 +575,7 @@ void chry_dap_usb2uart_handle(void)
     if (usbrx_idle_flag) {
         if (chry_ringbuffer_get_free(&g_usbrx) >= DAP_PACKET_SIZE) {
             usbrx_idle_flag = 0;
-            usbd_ep_start_read(CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
+            usbd_ep_start_read(0, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
         }
     }
 }
