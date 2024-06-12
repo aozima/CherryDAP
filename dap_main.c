@@ -428,25 +428,25 @@ void chry_dap_init(void)
 
     chry_dap_state_init();
 
-    usbd_desc_register(cmsisdap_descriptor);
-    usbd_bos_desc_register(&bos_desc);
-    usbd_msosv2_desc_register(&msosv2_desc);
+    usbd_desc_register(0, cmsisdap_descriptor);
+    usbd_bos_desc_register(0, &bos_desc);
+    usbd_msosv2_desc_register(0, &msosv2_desc);
 
     /*!< winusb */
-    usbd_add_interface(&dap_intf);
-    usbd_add_endpoint(&dap_out_ep);
-    usbd_add_endpoint(&dap_in_ep);
+    usbd_add_interface(0, &dap_intf);
+    usbd_add_endpoint(0, &dap_out_ep);
+    usbd_add_endpoint(0, &dap_in_ep);
 
     /*!< cdc acm */
-    usbd_add_interface(usbd_cdc_acm_init_intf(&intf1));
-    usbd_add_interface(usbd_cdc_acm_init_intf(&intf2));
-    usbd_add_endpoint(&cdc_out_ep);
-    usbd_add_endpoint(&cdc_in_ep);
+    usbd_add_interface(0, usbd_cdc_acm_init_intf(0, &intf1));
+    usbd_add_interface(0, usbd_cdc_acm_init_intf(0, &intf2));
+    usbd_add_endpoint(0, &cdc_out_ep);
+    usbd_add_endpoint(0, &cdc_in_ep);
 
 #ifdef CONFIG_CHERRYDAP_USE_MSC
     usbd_add_interface(usbd_msc_init_intf(&intf3, MSC_OUT_EP, MSC_IN_EP));
 #endif
-    usbd_initialize();
+    usbd_initialize(0, 0, 0);
 }
 
 void chry_dap_handle(void)
