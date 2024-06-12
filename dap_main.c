@@ -328,7 +328,7 @@ void dap_in_callback(uint8_t ep, uint32_t nbytes)
 {
     if (USB_ResponseCountI != USB_ResponseCountO) {
         // Load data from response buffer to be sent back
-        usbd_ep_start_write(DAP_IN_EP, USB_Response[USB_ResponseIndexO], USB_RespSize[USB_ResponseIndexO]);
+        usbd_ep_start_write(0, DAP_IN_EP, USB_Response[USB_ResponseIndexO], USB_RespSize[USB_ResponseIndexO]);
         USB_ResponseIndexO++;
         if (USB_ResponseIndexO == DAP_PACKET_COUNT) {
             USB_ResponseIndexO = 0U;
@@ -357,11 +357,11 @@ void usbd_cdc_acm_bulk_in(uint8_t ep, uint32_t nbytes)
     chry_ringbuffer_linear_read_done(&g_uartrx, nbytes);
     if ((nbytes % DAP_PACKET_SIZE) == 0 && nbytes) {
         /* send zlp */
-        usbd_ep_start_write(CDC_IN_EP, NULL, 0);
+        usbd_ep_start_write(0, CDC_IN_EP, NULL, 0);
     } else {
         if (chry_ringbuffer_get_used(&g_uartrx)) {
             buffer = chry_ringbuffer_linear_read_setup(&g_uartrx, &size);
-            usbd_ep_start_write(CDC_IN_EP, buffer, size);
+            usbd_ep_start_write(0, CDC_IN_EP, buffer, size);
         } else {
             usbtx_idle_flag = 1;
         }
@@ -505,7 +505,7 @@ void chry_dap_handle(void)
                 }
                 USB_ResponseCountO++;
                 USB_ResponseIdle = 0U;
-                usbd_ep_start_write(DAP_IN_EP, USB_Response[n], USB_RespSize[n]);
+                usbd_ep_start_write(0, DAP_IN_EP, USB_Response[n], USB_RespSize[n]);
             }
         }
     }
@@ -557,7 +557,7 @@ void chry_dap_usb2uart_handle(void)
             usbtx_idle_flag = 0;
             /* start first transfer */
             buffer = chry_ringbuffer_linear_read_setup(&g_uartrx, &size);
-            usbd_ep_start_write(CDC_IN_EP, buffer, size);
+            usbd_ep_start_write(0, CDC_IN_EP, buffer, size);
         }
     }
 
