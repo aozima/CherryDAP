@@ -142,6 +142,15 @@
 
 //#define USBD_IRQHandler USBD_IRQHandler
 //#define USB_BASE (0x40080000UL)
+
+#ifndef CONFIG_USBDEV_MAX_BUS
+#define CONFIG_USBDEV_MAX_BUS 1 // for now, bus num must be 1 except hpm ip
+#endif
+
+#ifndef CONFIG_USBDEV_EP_NUM
+#define CONFIG_USBDEV_EP_NUM 8
+#endif
+
 //#define USB_NUM_BIDIR_ENDPOINTS 4
 
 /* ================ USB Host Port Configuration ==================*/
