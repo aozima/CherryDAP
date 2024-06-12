@@ -419,7 +419,7 @@ struct usb_bos_descriptor bos_desc = {
     .string_len = USBD_BOS_WTOTALLENGTH
 };
 
-void chry_dap_init(void)
+void chry_dap_init(uint8_t busid, uint32_t reg_base)
 {
     chry_ringbuffer_init(&g_uartrx, uartrx_ringbuffer, CONFIG_UARTRX_RINGBUF_SIZE);
     chry_ringbuffer_init(&g_usbrx, usbrx_ringbuffer, CONFIG_USBRX_RINGBUF_SIZE);
@@ -428,25 +428,25 @@ void chry_dap_init(void)
 
     chry_dap_state_init();
 
-    usbd_desc_register(0, cmsisdap_descriptor);
-    usbd_bos_desc_register(0, &bos_desc);
-    usbd_msosv2_desc_register(0, &msosv2_desc);
+    usbd_desc_register(busid, cmsisdap_descriptor);
+    usbd_bos_desc_register(busid, &bos_desc);
+    usbd_msosv2_desc_register(busid, &msosv2_desc);
 
     /*!< winusb */
-    usbd_add_interface(0, &dap_intf);
-    usbd_add_endpoint(0, &dap_out_ep);
-    usbd_add_endpoint(0, &dap_in_ep);
+    usbd_add_interface(busid, &dap_intf);
+    usbd_add_endpoint(busid, &dap_out_ep);
+    usbd_add_endpoint(busid, &dap_in_ep);
 
     /*!< cdc acm */
-    usbd_add_interface(0, usbd_cdc_acm_init_intf(0, &intf1));
-    usbd_add_interface(0, usbd_cdc_acm_init_intf(0, &intf2));
-    usbd_add_endpoint(0, &cdc_out_ep);
-    usbd_add_endpoint(0, &cdc_in_ep);
+    usbd_add_interface(busid, usbd_cdc_acm_init_intf(0, &intf1));
+    usbd_add_interface(busid, usbd_cdc_acm_init_intf(0, &intf2));
+    usbd_add_endpoint(busid, &cdc_out_ep);
+    usbd_add_endpoint(busid, &cdc_in_ep);
 
 #ifdef CONFIG_CHERRYDAP_USE_MSC
     usbd_add_interface(usbd_msc_init_intf(&intf3, MSC_OUT_EP, MSC_IN_EP));
 #endif
-    usbd_initialize(0, 0, usbd_event_handler);
+    usbd_initialize(busid, reg_base, usbd_event_handler);
 }
 
 void chry_dap_handle(void)
