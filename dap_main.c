@@ -291,8 +291,8 @@ void usbd_event_handler(uint8_t busid, uint8_t event)
             /* setup first out ep read transfer */
             USB_RequestIdle = 0U;
 
-            usbd_ep_start_read(0, DAP_OUT_EP, USB_Request[0], DAP_PACKET_SIZE);
-            usbd_ep_start_read(0, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
+            usbd_ep_start_read(busid, DAP_OUT_EP, USB_Request[0], DAP_PACKET_SIZE);
+            usbd_ep_start_read(busid, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
             break;
         case USBD_EVENT_SET_REMOTE_WAKEUP:
             break;
@@ -318,7 +318,7 @@ void dap_out_callback(uint8_t busid, uint8_t ep, uint32_t nbytes)
 
     // Start reception of next request packet
     if ((uint16_t)(USB_RequestCountI - USB_RequestCountO) != DAP_PACKET_COUNT) {
-        usbd_ep_start_read(0, DAP_OUT_EP, USB_Request[USB_RequestIndexI], DAP_PACKET_SIZE);
+        usbd_ep_start_read(busid, DAP_OUT_EP, USB_Request[USB_RequestIndexI], DAP_PACKET_SIZE);
     } else {
         USB_RequestIdle = 1U;
     }
@@ -328,7 +328,7 @@ void dap_in_callback(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
     if (USB_ResponseCountI != USB_ResponseCountO) {
         // Load data from response buffer to be sent back
-        usbd_ep_start_write(0, DAP_IN_EP, USB_Response[USB_ResponseIndexO], USB_RespSize[USB_ResponseIndexO]);
+        usbd_ep_start_write(busid, DAP_IN_EP, USB_Response[USB_ResponseIndexO], USB_RespSize[USB_ResponseIndexO]);
         USB_ResponseIndexO++;
         if (USB_ResponseIndexO == DAP_PACKET_COUNT) {
             USB_ResponseIndexO = 0U;
@@ -343,7 +343,7 @@ void usbd_cdc_acm_bulk_out(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
     chry_ringbuffer_write(&g_usbrx, usb_tmpbuffer, nbytes);
     if (chry_ringbuffer_get_free(&g_usbrx) >= DAP_PACKET_SIZE) {
-        usbd_ep_start_read(0, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
+        usbd_ep_start_read(busid, CDC_OUT_EP, usb_tmpbuffer, DAP_PACKET_SIZE);
     } else {
         usbrx_idle_flag = 1;
     }
@@ -357,11 +357,11 @@ void usbd_cdc_acm_bulk_in(uint8_t busid, uint8_t ep, uint32_t nbytes)
     chry_ringbuffer_linear_read_done(&g_uartrx, nbytes);
     if ((nbytes % DAP_PACKET_SIZE) == 0 && nbytes) {
         /* send zlp */
-        usbd_ep_start_write(0, CDC_IN_EP, NULL, 0);
+        usbd_ep_start_write(busid, CDC_IN_EP, NULL, 0);
     } else {
         if (chry_ringbuffer_get_used(&g_uartrx)) {
             buffer = chry_ringbuffer_linear_read_setup(&g_uartrx, &size);
-            usbd_ep_start_write(0, CDC_IN_EP, buffer, size);
+            usbd_ep_start_write(busid, CDC_IN_EP, buffer, size);
         } else {
             usbtx_idle_flag = 1;
         }
@@ -438,8 +438,8 @@ void chry_dap_init(uint8_t busid, uint32_t reg_base)
     usbd_add_endpoint(busid, &dap_in_ep);
 
     /*!< cdc acm */
-    usbd_add_interface(busid, usbd_cdc_acm_init_intf(0, &intf1));
-    usbd_add_interface(busid, usbd_cdc_acm_init_intf(0, &intf2));
+    usbd_add_interface(busid, usbd_cdc_acm_init_intf(busid, &intf1));
+    usbd_add_interface(busid, usbd_cdc_acm_init_intf(busid, &intf2));
     usbd_add_endpoint(busid, &cdc_out_ep);
     usbd_add_endpoint(busid, &cdc_in_ep);
 
