@@ -304,7 +304,7 @@ void usbd_event_handler(uint8_t event)
     }
 }
 
-void dap_out_callback(uint8_t ep, uint32_t nbytes)
+void dap_out_callback(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
     if (USB_Request[USB_RequestIndexI][0] == ID_DAP_TransferAbort) {
         DAP_TransferAbort = 1U;
@@ -324,7 +324,7 @@ void dap_out_callback(uint8_t ep, uint32_t nbytes)
     }
 }
 
-void dap_in_callback(uint8_t ep, uint32_t nbytes)
+void dap_in_callback(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
     if (USB_ResponseCountI != USB_ResponseCountO) {
         // Load data from response buffer to be sent back
@@ -339,7 +339,7 @@ void dap_in_callback(uint8_t ep, uint32_t nbytes)
     }
 }
 
-void usbd_cdc_acm_bulk_out(uint8_t ep, uint32_t nbytes)
+void usbd_cdc_acm_bulk_out(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
     chry_ringbuffer_write(&g_usbrx, usb_tmpbuffer, nbytes);
     if (chry_ringbuffer_get_free(&g_usbrx) >= DAP_PACKET_SIZE) {
@@ -349,7 +349,7 @@ void usbd_cdc_acm_bulk_out(uint8_t ep, uint32_t nbytes)
     }
 }
 
-void usbd_cdc_acm_bulk_in(uint8_t ep, uint32_t nbytes)
+void usbd_cdc_acm_bulk_in(uint8_t busid, uint8_t ep, uint32_t nbytes)
 {
     uint32_t size;
     uint8_t *buffer;
