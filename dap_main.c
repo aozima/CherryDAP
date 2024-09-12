@@ -388,10 +388,10 @@ static struct usbd_endpoint cdc_in_ep = {
     .ep_cb = usbd_cdc_acm_bulk_in
 };
 
-struct usbd_interface dap_intf;
-struct usbd_interface intf1;
-struct usbd_interface intf2;
-struct usbd_interface intf3;
+static struct usbd_interface dap_intf;
+static struct usbd_interface intf1;
+static struct usbd_interface intf2;
+static struct usbd_interface intf3;
 
 static void chry_dap_state_init(void)
 {
