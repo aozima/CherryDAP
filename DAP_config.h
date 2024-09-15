@@ -330,9 +330,9 @@ NRESET--IO   PA28
 #define PIN_TDO_PORT                    GPIO_OE_GPIOA
 #define PIN_TDO_NUM                     23
 
-#define PIN_nRESET                      IOC_PAD_PA28
+#define PIN_nRESET                      IOC_PAD_PA17
 #define PIN_nRESET_PORT                 GPIO_OE_GPIOA
-#define PIN_nRESET_NUM                  28
+#define PIN_nRESET_NUM                  17
 
 #endif
 
